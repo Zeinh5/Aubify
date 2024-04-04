@@ -13,7 +13,7 @@ function EmailVerification() {
 
     try {
       // Make a request to your backend to verify the code
-      const response = await fetch('https://aubify-b.netlify.app/verifyEmail', {
+      const response = await fetch('https://aubify.vercel.app/verifyEmail', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
