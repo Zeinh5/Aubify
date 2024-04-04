@@ -72,7 +72,7 @@ const CommentPage = () => {
  // Example function to upvote a comment based on its index within the post's comments array
 const handleVoteUpvote = async (postId,commentIndex) => {
   try {
-    await axios.post(`http://localhost:8080/posts/${postId}/comments/${commentIndex}/upvote`, {
+    await axios.post(`https://aubify-b.netlify.app/posts/${postId}/comments/${commentIndex}/upvote`, {
       userEmail: localStorage.getItem('userEmail'),
     });
     fetchPostAndComments(); // Refresh to show updated vote counts
@@ -83,7 +83,7 @@ const handleVoteUpvote = async (postId,commentIndex) => {
 
 const handleVoteDownvote = async (postId,commentIndex) => {
   try {
-    await axios.post(`http://localhost:8080/posts/${postId}/comments/${commentIndex}/downvote`, {
+    await axios.post(`https://aubify-b.netlify.app/posts/${postId}/comments/${commentIndex}/downvote`, {
       userEmail: localStorage.getItem('userEmail'),
     });
     fetchPostAndComments(); // Refresh to show updated vote counts
@@ -95,7 +95,7 @@ const handleVoteDownvote = async (postId,commentIndex) => {
 const handleUpvote = async (postId) => {
   const userEmail = localStorage.getItem('userEmail'); // Retrieve the user's email
   try {
-    await axios.post(`http://localhost:8080/posts/${postId}/upvote`, { userEmail });
+    await axios.post(`https://aubify-b.netlify.app/posts/${postId}/upvote`, { userEmail });
     fetchPosts(); // Refresh the posts to reflect the new upvote count
   } catch (error) {
     console.error('Failed to upvote post:', error);
@@ -105,7 +105,7 @@ const handleUpvote = async (postId) => {
 const handleDownvote = async (postId) => {
   const userEmail = localStorage.getItem('userEmail'); // Retrieve the user's email
   try {
-    await axios.post(`http://localhost:8080/posts/${postId}/downvote`, { userEmail });
+    await axios.post(`https://aubify-b.netlify.app/${postId}/downvote`, { userEmail });
     fetchPosts(); // Refresh the posts to reflect the new downvote count
   } catch (error) {
     console.error('Failed to downvote post:', error);
@@ -115,7 +115,7 @@ const handleDownvote = async (postId) => {
 const fetchPosts = async () => {
   try {
     // Use the postId from useParams to make a request for a specific post
-    const response = await axios.get(`http://localhost:8080/posts/${postId}`);
+    const response = await axios.get(`https://aubify-b.netlify.app/${postId}`);
     if (response.status === 200) {
       setPost(response.data);
     } else {
