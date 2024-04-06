@@ -27,7 +27,7 @@ function SigninSignup({ user, setUser }) {
 
   const checkUserExists = async (email) => {
     try {
-      const response = await fetch('https://aubify.vercel.app/checkUserExists', {
+      const response = await fetch('https://aubify-b.netlify.app/checkUserExists', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -50,7 +50,7 @@ function SigninSignup({ user, setUser }) {
 
   const checkPassword = async (email, password) => {
     try {
-      const response = await fetch('https://aubify.vercel.app/checkPassword', {
+      const response = await fetch('https://aubify-b.netlify.app/checkPassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -73,7 +73,7 @@ function SigninSignup({ user, setUser }) {
 
   const checkUserVerified = async (email) => {
     try {
-      const response = await fetch('https://aubify.vercel.app/checkUserVerified', {
+      const response = await fetch('https://aubify-b.netlify.app/checkUserVerified', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ function SigninSignup({ user, setUser }) {
   const saveUserData = async (name, email, password) => {
     try {
       const userData = { name, email, password };
-      const response = await fetch('https://aubify.vercel.app/saveUserData', {
+      const response = await fetch('https://aubify-b.netlify.app/saveUserData', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -152,7 +152,7 @@ function SigninSignup({ user, setUser }) {
 
     // After saving user data but before navigating
     try {
-      const response = await fetch('https://aubify.vercel.app/handleSignup', {
+      const response = await fetch('https://aubify-b.netlify.app/handleSignup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ function SigninSignup({ user, setUser }) {
     localStorage.setItem('userEmail', signinEmail);
     // Proceed with login if user exists, password is correct, and user is verified
     try {
-      const response = await fetch('https://aubify.vercel.app/handleSignin', {
+      const response = await fetch('https://aubify-b.netlify.app/handleSignin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

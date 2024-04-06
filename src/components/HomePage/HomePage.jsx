@@ -36,7 +36,7 @@ const HomePage = () => {
     const userEmail = localStorage.getItem('userEmail');
     const savedFilter = localStorage.getItem('selectedFilter');
     try {
-      await axios.post(`https://aubify.vercel.app/posts/${postId}/upvote`, { userEmail });
+      await axios.post(`https://aubify-b.netlify.app/${postId}/upvote`, { userEmail });
       fetchPostsFiltered(savedFilter) // Refresh the posts to reflect the new upvote count
     } catch (error) {
       console.error('Failed to upvote post:', error);
@@ -47,7 +47,7 @@ const HomePage = () => {
     const userEmail = localStorage.getItem('userEmail'); // Retrieve the user's email
     const savedFilter = localStorage.getItem('selectedFilter');
     try {
-      await axios.post(`https://aubify.vercel.app/posts/${postId}/downvote`, { userEmail });
+      await axios.post(`https://aubify-b.netlify.app/${postId}/downvote`, { userEmail });
       fetchPostsFiltered(savedFilter); // Refresh the posts to reflect the new downvote count
     } catch (error) {
       console.error('Failed to downvote post:', error);
@@ -100,7 +100,7 @@ const HomePage = () => {
     
     try {
       // Include the userEmail in the request body
-      await axios.post('https://aubify.vercel.app/posts', { 
+      await axios.post('https://aubify-b.netlify.app/posts', { 
         title: newPostTitle, 
         content: newPostContent, 
         userEmail // Send the user's email with the post data
@@ -117,7 +117,7 @@ const HomePage = () => {
   const fetchPostsFiltered = async (filter) => {
     try {
       // Include the filter in the request as a query parameter
-      const response = await axios.get(`https://aubify.vercel.app/posts?filter=${filter}`);
+      const response = await axios.get(`https://aubify-b.netlify.app/posts?filter=${filter}`);
       setPosts(response.data);
     } catch (error) {
       console.error('Failed to fetch posts:', error);

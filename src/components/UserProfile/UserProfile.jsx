@@ -22,7 +22,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUserPosts = async () => {
       try {
-        const response = await axios.get(`https://aubify.vercel.app/user/posts?email=${userEmail}`);
+        const response = await axios.get(`https://aubify-b.netlify.app/user/posts?email=${userEmail}`);
         setUserPosts(response.data);
       } catch (error) {
         console.error('Failed to fetch user posts:', error);
@@ -31,7 +31,7 @@ const UserProfile = () => {
 
     const fetchAvatar = async () => {
       try {
-        const response = await axios.get(`https://aubify.vercel.app/user/avatar?email=${userEmail}`);
+        const response = await axios.get(`https://aubify-b.netlify.app/user/avatar?email=${userEmail}`);
         const avatarUrl = response.data.avatarUrl;
         if (avatarUrl) {
           setSelectedAvatar(avatarUrl);
@@ -48,7 +48,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchDateCreated = async () => {
       try {
-        const response = await axios.get(`https://aubify.vercel.app/user/date-created?email=${userEmail}`);
+        const response = await axios.get(`https://aubify-b.netlify.app/user/date-created?email=${userEmail}`);
         setDateCreated(response.data.dateCreated);
       } catch (error) {
         console.error('Failed to fetch date created:', error);
@@ -66,7 +66,7 @@ const UserProfile = () => {
     setSelectedAvatar(avatarUrl); // Set selected avatar when clicked
 
     // Send request to backend to update avatar
-    axios.post('https://aubify.vercel.app/user/update-avatar', { email: userEmail, avatarUrl })
+    axios.post('https://aubify-b.netlify.app/user/update-avatar', { email: userEmail, avatarUrl })
       .then(() => console.log('Avatar updated successfully'))
       .catch(error => console.error('Failed to update avatar:', error));
   };
