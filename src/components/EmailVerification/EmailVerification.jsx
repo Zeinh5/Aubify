@@ -16,7 +16,7 @@ function EmailVerification() {
       // Make a request to your backend to verify the code
       const response = await axios.post('/verifyEmail',  ({ verificationCode }))
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Verification failed');
       }
 

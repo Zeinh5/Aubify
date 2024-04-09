@@ -53,7 +53,7 @@ function SigninSignup({ user, setUser }) {
     try {
       const response = await axios.post('/checkPassword', { email, password })
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Network response was not ok.');
       }
       return response.data.correctPassword; // Assuming the response contains a boolean value indicating password correctness
@@ -69,12 +69,11 @@ function SigninSignup({ user, setUser }) {
       const response = await axios.post('/checkUserVerified', 
         { email })
   
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Network response was not ok.');
       }
   
-      const data = await response.json();
-      return data.isVerified; // Assuming the response contains a boolean value indicating user verification status
+      return response.data.isVerified; // Assuming the response contains a boolean value indicating user verification status
     } catch (error) {
       console.error('Error checking user verification status:', error);
       // Handle error, such as displaying a generic error message to the user
@@ -87,7 +86,7 @@ function SigninSignup({ user, setUser }) {
       const userData = { name, email, password };
       const response = await axios.post('/saveUserData', {userData})
   
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Network response was not ok.');
       }
   
@@ -142,23 +141,22 @@ function SigninSignup({ user, setUser }) {
       const response = await axios.post('/handleSignup', ({ email: signupEmail })) // Use signupEmail here
     
     
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Failed to fetch user data');
       }
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         // Save username in localStorage
-        localStorage.setItem('username', data.userName);
-        setUsername(data.userName); // This assumes setUsername is the method to update context or state
+        localStorage.setItem('username', response.data.userName);
+        setUsername(response.data.userName); // This assumes setUsername is the method to update context or state
         
         // Check if the user's email is verified
-        if (data.emailVerified) {
+        if (response.data.emailVerified) {
           // Navigate to homepage or proceed as verified user
           navigate('/homepage');
         }
       } else {
         // Handle case where user data is not returned or another error occurred
-        setSignupError(data.message || 'Failed to get user data. Please try again.');
+        setSignupError(response.data.message || 'Failed to get user data. Please try again.');
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -204,15 +202,14 @@ function SigninSignup({ user, setUser }) {
     try {
       const response = await axios.post('/handleSignin', { email: signinEmail })
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Failed to fetch username');
       }
 
-      const data = await response.json();
-      if (data.success && data.userName) {
+      if (response.data.success && response.data.userName) {
         // Assuming setUsername updates the username in your global state/context
-        setUsername(data.userName); // Update username in context with the name fetched from backend
-        const username = data.userName; // Make sure to extract the username from the response or based on your logic
+        setUsername(response.data.userName); // Update username in context with the name fetched from backend
+        const username = response.data.userName; // Make sure to extract the username from the response or based on your logic
         localStorage.setItem('username', username); // Save username to localStorage
 
         // Check if user is admin based on email
