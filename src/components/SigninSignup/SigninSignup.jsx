@@ -56,9 +56,7 @@ function SigninSignup({ user, setUser }) {
       if (!response.ok) {
         throw new Error('Network response was not ok.');
       }
-
-      const data = await response.json();
-      return data.correctPassword; // Assuming the response contains a boolean value indicating password correctness
+      return response.data.correctPassword; // Assuming the response contains a boolean value indicating password correctness
     } catch (error) {
       console.error('Error checking password:', error);
       // Handle error, such as displaying a generic error message to the user
