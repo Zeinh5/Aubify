@@ -6,27 +6,31 @@ import upvoteIcon from '../icons/upvote.png';
 import downvoteIcon from '../icons/downvote.png';
 import commentIcon from '../icons/comment.png';
 import shareIcon from '../icons/share.png';
+import reportIcon from '../icons/report.png';
 import NavBar from '../NavBar/NavBar';
 
 
 const CommentPage = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
+  const [comment, setComment] = useState(null); // State to store the fetched comment
   const [newComment, setNewComment] = useState('');
   const [remainingCharacters, setRemainingCharacters] = useState(250);
 
   useEffect(() => {
     fetchPostAndComments();
-  }, [postId]);
+  }, []);
 
   const fetchPostAndComments = async () => {
     try {
-      const postResponse = await axios.get(`https://aubify-b.netlify.app/posts/${postId}`);
-      setPost(postResponse.data);
+      const response = await axios.get(`http://localhost:8080/posts/${postId}`);
+      const fetchedPost = { ...response.data, authorAnonymousId: response.data.author.anonymousId };
+      setPost(fetchedPost);
     } catch (error) {
       console.error('Failed to fetch post:', error);
     }
   };
+  
 
   const handleAddComment = async () => {
     if (newComment.trim() === '') {
@@ -34,32 +38,38 @@ const CommentPage = () => {
       return;
     }
   
-    // Assuming the backend expects an object with a 'content' field for a new comment
+    const userEmail = localStorage.getItem('userEmail');
+    if (!userEmail) {
+      console.error('User email not found. Please ensure the user is logged in.');
+      return;
+    }
+  
     const commentData = {
       content: newComment,
-      // Initialize any other fields if necessary, like upvotes, downvotes
+      userEmail,
     };
   
     try {
-      const response = await axios.post(`https://aubify-b.netlify.app/${postId}/comments`, {
-        comment: commentData, // Sending the comment as an object
-      }, {
+      const response = await axios.post(`http://localhost:8080/posts/${postId}/comments`, commentData, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
   
-      if (response.status !== 200) {
+      if (response.status === 201 || response.status === 200) { // Ensure successful response
+        setNewComment(''); // Clear the text field
+        setRemainingCharacters(250); // Reset remaining characters
+        fetchPostAndComments(); // Explicitly refetch post and comments to ensure UI is updated
+      } else {
         throw new Error('Failed to add comment');
       }
-  
-      const updatedPost = response.data;
-      setPost(updatedPost); // Update the post with the new comment
-      setNewComment('');
     } catch (error) {
       console.error('Failed to add comment:', error);
+      // Optionally, display an error message to the user
+      alert('Failed to add comment. Please try again later.');
     }
   };
+  
   
   const handleInputChange = (event) => {
     const { value } = event.target;
@@ -70,33 +80,34 @@ const CommentPage = () => {
   };
 
  // Example function to upvote a comment based on its index within the post's comments array
-const handleVoteUpvote = async (postId,commentIndex) => {
+ const handleVoteUpvote = async (postId, commentId) => {
   try {
-    await axios.post(`https://aubify-b.netlify.app/posts/${postId}/comments/${commentIndex}/upvote`, {
+    await axios.post(`http://localhost:8080/posts/${postId}/comments/${commentId}/upvote`, {
       userEmail: localStorage.getItem('userEmail'),
     });
     fetchPostAndComments(); // Refresh to show updated vote counts
   } catch (error) {
-    console.error(`Failed to upvote vote on comment:`, error);
+    console.error(`Failed to upvote on comment:`, error);
   }
 };
 
-const handleVoteDownvote = async (postId,commentIndex) => {
+const handleVoteDownvote = async (postId, commentId) => {
   try {
-    await axios.post(`https://aubify-b.netlify.app/posts/${postId}/comments/${commentIndex}/downvote`, {
+    await axios.post(`http://localhost:8080/posts/${postId}/comments/${commentId}/downvote`, {
       userEmail: localStorage.getItem('userEmail'),
     });
     fetchPostAndComments(); // Refresh to show updated vote counts
   } catch (error) {
-    console.error(`Failed to upvote vote on comment:`, error);
+    console.error(`Failed to downvote on comment:`, error);
   }
 };
+
 
 const handleUpvote = async (postId) => {
   const userEmail = localStorage.getItem('userEmail'); // Retrieve the user's email
   try {
-    await axios.post(`https://aubify-b.netlify.app/posts/${postId}/upvote`, { userEmail });
-    fetchPosts(); // Refresh the posts to reflect the new upvote count
+    await axios.post(`http://localhost:8080/posts/${postId}/upvote`, { userEmail });
+    fetchPostAndComments(); // Refresh the posts to reflect the new upvote count
   } catch (error) {
     console.error('Failed to upvote post:', error);
   }
@@ -105,24 +116,10 @@ const handleUpvote = async (postId) => {
 const handleDownvote = async (postId) => {
   const userEmail = localStorage.getItem('userEmail'); // Retrieve the user's email
   try {
-    await axios.post(`https://aubify-b.netlify.app/${postId}/downvote`, { userEmail });
-    fetchPosts(); // Refresh the posts to reflect the new downvote count
+    await axios.post(`http://localhost:8080/posts/${postId}/downvote`, { userEmail });
+    fetchPostAndComments(); // Refresh the posts to reflect the new downvote count
   } catch (error) {
     console.error('Failed to downvote post:', error);
-  }
-};
-
-const fetchPosts = async () => {
-  try {
-    // Use the postId from useParams to make a request for a specific post
-    const response = await axios.get(`https://aubify-b.netlify.app/${postId}`);
-    if (response.status === 200) {
-      setPost(response.data);
-    } else {
-      console.error('Failed to fetch post: Server responded with status', response.status);
-    }
-  } catch (error) {
-    console.error('Failed to fetch post:', error);
   }
 };
 
@@ -132,6 +129,14 @@ const fetchPosts = async () => {
       <h3>Post:</h3>
       {post ? (
         <div key={post._id} className="post">
+          <div className="post-details-comment">
+                <div className='post-anonymousId'>
+                  {post.authorAnonymousId}
+                </div>
+                <div className="post-created-at">
+                {new Date(post.createdAt).toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'})}
+                </div>
+          </div>
           <h2>{post.title}</h2>
           <p>{post.content}</p>
           <div className="comment-interactions">
@@ -148,12 +153,15 @@ const fetchPosts = async () => {
               <span className="interaction-count">{post.comments ? post.comments.length : 0}</span>
             </button>
             <button className="interaction-button">
+              <img src={reportIcon} alt="Report" />
+            </button>
+            <button className="interaction-button">
               <img src={shareIcon} alt="Share" />
             </button>
           </div>
         </div>
       ) : (
-        <p>Loading post...</p>
+        <p className='loading-post'>Loading post...</p>
       )}
              <div className="add-comment">
              <h3>Comments:</h3>
@@ -166,28 +174,40 @@ const fetchPosts = async () => {
         <button onClick={handleAddComment} type="submit">Comment</button>
       </div>
       <div className="comments-container">
-        <div className="comments-list">
-          {post && post.comments.map((comment, index) => (
-            <div key={index} className="comment">
-              <p>{comment.content}</p>
-              <div className="comment-interactions">
-                <button className="interaction-button" onClick={() => handleVoteUpvote(postId,index)} >
-                <img src={upvoteIcon} alt="Upvote" />
-                <span className="interaction-count">{post.comments[index].upvotes || 0}</span>
-                </button>
-                <button className="interaction-button" onClick={() => handleVoteDownvote(postId,index)} >
-                <img src={downvoteIcon} alt="Downvote" />
-                <span className="interaction-count">{post.comments[index].downvotes || 0}</span>
-                </button>
-                <button className="interaction-button">
-                  <img src={shareIcon} alt="Share" />
-                </button>
-              </div>
-            </div>
-          ))}
+  <div className="comments-list">
+    {post && post.comments.map((comment) => ( // Removed index as it's no longer needed for the key
+      <div key={comment._id} className="comment"> {/* Use comment._id for a unique key */}
+        <div className='comment-details'>
+          <div className='comment-anonymousId'>
+            {comment.author.anonymousId}
+          </div>
+          <div className="comment-created-at">
+          {new Date(comment.createdAt).toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'})}
+          </div>
+        </div>
+        <p>{comment.content}</p>
+        <div className="comment-interactions">
+          <button className="interaction-button" onClick={() => handleVoteUpvote(postId, comment._id)} >
+            <img src={upvoteIcon} alt="Upvote" />
+            <span className="interaction-count">{comment.upvotes || 0}</span>
+          </button>
+          <button className="interaction-button" onClick={() => handleVoteDownvote(postId, comment._id)} >
+            <img src={downvoteIcon} alt="Downvote" />
+            <span className="interaction-count">{comment.downvotes || 0}</span>
+          </button>
+          <button className="interaction-button">
+              <img src={reportIcon} alt="Report" />
+            </button>
+          <button className="interaction-button">
+            <img src={shareIcon} alt="Share" />
+          </button>
         </div>
       </div>
+    ))}
+  </div>
+</div>
     </div>
   );
 };
+
 export default CommentPage;

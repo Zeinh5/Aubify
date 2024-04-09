@@ -12,8 +12,14 @@ function SigninSignup({ user, setUser }) {
   const [signinEmail, setSigninEmail] = useState('');
   const [signinPassword, setSigninPassword] = useState('');
   const [signinError, setSigninError] = useState('');
-  const { setUsername } = useUser();
+  const { setUsername, setIsAdmin } = useUser();
   const navigate = useNavigate();
+
+    // Function to check if the user is an admin based on email
+    const isAdminUser = (email) => {
+      const adminEmails = ['ofa15@mail.aub.edu', 'hmh97@mail.aub.edu']; // Define admin emails
+      return adminEmails.includes(email); // Check if email is in the admin list
+    };
 
   const handleRegisterClick = () => {
     setActiveContainer('active');
@@ -27,7 +33,7 @@ function SigninSignup({ user, setUser }) {
 
   const checkUserExists = async (email) => {
     try {
-      const response = await fetch('https://aubify-b.netlify.app/checkUserExists', {
+      const response = await fetch('http://localhost:8080/checkUserExists', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -50,7 +56,7 @@ function SigninSignup({ user, setUser }) {
 
   const checkPassword = async (email, password) => {
     try {
-      const response = await fetch('https://aubify-b.netlify.app/checkPassword', {
+      const response = await fetch('http://localhost:8080/checkPassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -73,7 +79,7 @@ function SigninSignup({ user, setUser }) {
 
   const checkUserVerified = async (email) => {
     try {
-      const response = await fetch('https://aubify-b.netlify.app/checkUserVerified', {
+      const response = await fetch('http://localhost:8080/checkUserVerified', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -97,7 +103,7 @@ function SigninSignup({ user, setUser }) {
   const saveUserData = async (name, email, password) => {
     try {
       const userData = { name, email, password };
-      const response = await fetch('https://aubify-b.netlify.app/saveUserData', {
+      const response = await fetch('http://localhost:8080/saveUserData', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -145,6 +151,11 @@ function SigninSignup({ user, setUser }) {
       return;
     }
 
+    // Check if user is admin based on email
+    const adminStatus = isAdminUser(signupEmail);
+    setIsAdmin(adminStatus);
+    // localStorage.setItem('isAdmin', adminStatus ? 'true' : 'false');
+
     navigate('/email_verification');
 
     await saveUserData(signupName, signupEmail, signupPassword);
@@ -152,7 +163,7 @@ function SigninSignup({ user, setUser }) {
 
     // After saving user data but before navigating
     try {
-      const response = await fetch('https://aubify-b.netlify.app/handleSignup', {
+      const response = await fetch('http://localhost:8080/handleSignup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +231,7 @@ function SigninSignup({ user, setUser }) {
     localStorage.setItem('userEmail', signinEmail);
     // Proceed with login if user exists, password is correct, and user is verified
     try {
-      const response = await fetch('https://aubify-b.netlify.app/handleSignin', {
+      const response = await fetch('http://localhost:8080/handleSignin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -238,6 +249,12 @@ function SigninSignup({ user, setUser }) {
         setUsername(data.userName); // Update username in context with the name fetched from backend
         const username = data.userName; // Make sure to extract the username from the response or based on your logic
         localStorage.setItem('username', username); // Save username to localStorage
+
+        // Check if user is admin based on email
+        const adminStatus = isAdminUser(signinEmail);
+        setIsAdmin(adminStatus);
+        // localStorage.setItem('isAdmin', adminStatus ? 'true' : 'false');
+
         navigate('/homepage'); // Navigate to homepage after successful sign-in
       } else {
         // Handle case where username is not found or another error occurred

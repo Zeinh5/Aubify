@@ -44,16 +44,15 @@ const ChangePassword = () => {
       setPasswordError('Current password is incorrect.');
       return;
     }
+
+    // Check if confirm password matches new password
+    if (!passwordMatch) {
+      return;
+    }
   
     // Check if the new password meets strength criteria
     if (!passwordStrong) {
       setPasswordError('New password must be at least 8 characters long and contain at least one uppercase letter, one number, and one special character.');
-      return;
-    }
-  
-    // Check if confirm password matches new password
-    if (!passwordMatch) {
-      setPasswordError('Passwords do not match.');
       return;
     }
   
@@ -74,7 +73,7 @@ const ChangePassword = () => {
   const checkCurrentPassword = async (password) => {
     try {
       const email = localStorage.getItem('userEmail');
-      const response = await axios.post('https://aubify-b.netlify.app/checkCurrentPassword', { email, password });
+      const response = await axios.post('http://localhost:8080/checkCurrentPassword', { email, password });
       return response.data.currentPasswordMatch;
     } catch (error) {
       console.error('Error checking current password:', error);
@@ -85,7 +84,7 @@ const ChangePassword = () => {
   // Function to save the new password in the database
   const saveNewPassword = async (email, newPassword) => {
     try {
-      await axios.post('https://aubify-b.netlify.app/saveNewPassword', { email, newPassword });
+      await axios.post('http://localhost:8080/saveNewPassword', { email, newPassword });
       console.log('New password saved successfully.');
       // Optionally, handle success or failure after saving the new password
     } catch (error) {

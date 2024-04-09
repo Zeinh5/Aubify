@@ -1,86 +1,120 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useUser } from '../../UserContext';
-import './NavBar.css';
-import SideBar from '../SideBar/SideBar';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "../../UserContext";
+import "./NavBar.css";
+import SideBar from "../SideBar/SideBar";
+import menuIcon from "../icons/menu.png";
+import axios from "axios";
 
-const Navbar = ({ onSearch }) => { // Pass onSearch function as a prop
+const Navbar = ({ onSearch }) => {
   const navigate = useNavigate();
   const { username, setUsername } = useUser();
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const location = useLocation(); // Get the current location
-
-  // Check if the search bar should be visible based on the current location
-  const isSearchVisible = location.pathname === '/homepage';
+  const [userAvatar, setUserAvatar] = useState(""); // Initialize state for user avatar
+  const location = useLocation();
+  const { isAdmin, setIsAdmin } = useUser();
+  const userEmail = localStorage.getItem("userEmail");
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
+    const storedUsername = localStorage.getItem("username");
     if (storedUsername) {
       setUsername(storedUsername);
     }
+    fetchAvatar();
   }, []);
 
-  useEffect(() => {
-    // Check if the user is authenticated
-    if (!isAuthenticated()) {
-      // If not authenticated, redirect to the sign-in page
-      navigate('/');
+  const fetchAdminStatus = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/checkAdminStatus?userEmail=${userEmail}`
+      );
+      setIsAdmin(response.data.isAdmin);
+    } catch (error) {
+      console.error("Error fetching admin status:", error);
     }
-  }, [navigate]);
+  };
+
+  useEffect(() => {
+    fetchAdminStatus();
+  }, [userEmail, isAdmin]); // Run the effect when userEmail changes
 
   const handleSignOut = () => {
-    // Remove the username from local storage
     localStorage.clear();
-    // Redirect to the sign-in/sign-up page
-    navigate('/');
-    // Clear the session history
-    window.history.replaceState(null, '', '/');
-    // Prevent further navigation using the back button
+    navigate("/");
+    window.history.replaceState(null, "", "/");
     window.onpopstate = () => {
-      navigate('/');
-      window.history.replaceState(null, '', '/');
+      navigate("/");
+      window.history.replaceState(null, "", "/");
     };
   };
 
+  const fetchAvatar = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/user/avatar?email=${userEmail}`
+      );
+      const avatarUrl = response.data.avatarUrl;
+      if (avatarUrl) {
+        setUserAvatar(avatarUrl);
+      }
+    } catch (error) {
+      console.error("Failed to fetch avatar:", error);
+    }
+  };
+
   const handleSearch = (event) => {
-    const searchTerm = event.target.value; // Capture the search term
-    onSearch(searchTerm); // Pass the search term to the parent component
+    const searchTerm = event.target.value;
+    onSearch(searchTerm);
   };
 
   const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible); // Toggle sidebar visibility
+    setSidebarVisible(!sidebarVisible);
   };
 
   const closeSidebar = () => {
     setSidebarVisible(false);
   };
 
-  const isAuthenticated = () => {
-    // Retrieve the username from localStorage
-    const username = localStorage.getItem('username');
-
-    // Check if the username exists and is not empty
-    return username !== null && username.trim() !== '';
-  };
-
   return (
     <>
       <nav className="navbar">
-        <div className="navbar-left" onClick={toggleSidebar}>
+        <div className="navbar-left">
+          <img
+            src={menuIcon}
+            alt="Menu"
+            className="menu-icon"
+            onClick={toggleSidebar}
+          />
           <img src="/aubify-logo.jpg" alt="Logo" className="navbar-logo" />
           <span className="website-name">Aubify</span>
         </div>
-        {isSearchVisible && (
-          <div className="navbar-center">
-            <input type="text" placeholder="Search..." onChange={handleSearch} />
-          </div>
-        )}
+        <div className="navbar-center">
+          {location.pathname === "/homepage" && (
+            <input
+              type="text"
+              placeholder="Search..."
+              onChange={handleSearch}
+            />
+          )}
+        </div>
         <div className="navbar-right">
-          <p>Welcome,</p>
-          <span className="user-name">{username}</span>
+          {userAvatar && (
+            <img
+              src={userAvatar}
+              alt="User Avatar"
+              className="user-avatar-home"
+            />
+          )}
+          <div className="navbar-name">
+            <span className="user-name">{username}</span>
+          </div>
         </div>
       </nav>
-      <SideBar isOpen={sidebarVisible} onClose={closeSidebar} onSignOut={handleSignOut} />
+      <SideBar
+        isOpen={sidebarVisible}
+        onClose={closeSidebar}
+        onSignOut={handleSignOut}
+      />
     </>
   );
 };
