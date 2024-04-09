@@ -23,7 +23,7 @@ const CommentPage = () => {
 
   const fetchPostAndComments = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/posts/${postId}`);
+      const response = await axios.get(`/posts/${postId}`);
       const fetchedPost = { ...response.data, authorAnonymousId: response.data.author.anonymousId };
       setPost(fetchedPost);
     } catch (error) {
@@ -50,7 +50,7 @@ const CommentPage = () => {
     };
   
     try {
-      const response = await axios.post(`http://localhost:8080/posts/${postId}/comments`, commentData, {
+      const response = await axios.post(`/posts/${postId}/comments`, commentData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -82,7 +82,7 @@ const CommentPage = () => {
  // Example function to upvote a comment based on its index within the post's comments array
  const handleVoteUpvote = async (postId, commentId) => {
   try {
-    await axios.post(`http://localhost:8080/posts/${postId}/comments/${commentId}/upvote`, {
+    await axios.post(`/posts/${postId}/comments/${commentId}/upvote`, {
       userEmail: localStorage.getItem('userEmail'),
     });
     fetchPostAndComments(); // Refresh to show updated vote counts
@@ -93,7 +93,7 @@ const CommentPage = () => {
 
 const handleVoteDownvote = async (postId, commentId) => {
   try {
-    await axios.post(`http://localhost:8080/posts/${postId}/comments/${commentId}/downvote`, {
+    await axios.post(`/posts/${postId}/comments/${commentId}/downvote`, {
       userEmail: localStorage.getItem('userEmail'),
     });
     fetchPostAndComments(); // Refresh to show updated vote counts
@@ -106,7 +106,7 @@ const handleVoteDownvote = async (postId, commentId) => {
 const handleUpvote = async (postId) => {
   const userEmail = localStorage.getItem('userEmail'); // Retrieve the user's email
   try {
-    await axios.post(`http://localhost:8080/posts/${postId}/upvote`, { userEmail });
+    await axios.post(`/posts/${postId}/upvote`, { userEmail });
     fetchPostAndComments(); // Refresh the posts to reflect the new upvote count
   } catch (error) {
     console.error('Failed to upvote post:', error);
@@ -116,7 +116,7 @@ const handleUpvote = async (postId) => {
 const handleDownvote = async (postId) => {
   const userEmail = localStorage.getItem('userEmail'); // Retrieve the user's email
   try {
-    await axios.post(`http://localhost:8080/posts/${postId}/downvote`, { userEmail });
+    await axios.post(`/posts/${postId}/downvote`, { userEmail });
     fetchPostAndComments(); // Refresh the posts to reflect the new downvote count
   } catch (error) {
     console.error('Failed to downvote post:', error);

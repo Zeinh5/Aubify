@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SigninSignup.css';
 import { useUser } from '../../UserContext'; // Go up two levels
+import axios  from "axios";
 
 function SigninSignup({ user, setUser }) {
   const [activeContainer, setActiveContainer] = useState('');
@@ -32,23 +33,17 @@ function SigninSignup({ user, setUser }) {
   };
 
   const checkUserExists = async (email) => {
+    // console.log("===================> hello")
     try {
-      const response = await fetch('http://localhost:8080/checkUserExists', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email })
-      });
-
-      if (!response.ok) {
+      const response = await axios.post('/checkUserExists', { email })
+      // console.log("===================>", response)
+      if (response.status !== 200) {
         throw new Error('Network response was not ok.');
       }
-
-      const data = await response.json();
-      return data.exists; // Assuming the response contains a boolean value indicating user existence
+      return response.data.exists; // Assuming the response contains a boolean value indicating user existence
     } catch (error) {
-      console.error('Error checking user existence:', error);
+      // console.log("===================>", error)
+      // console.error('Error checking user existence:', error);
       // Handle error, such as displaying a generic error message to the user
       return false;
     }
@@ -56,13 +51,7 @@ function SigninSignup({ user, setUser }) {
 
   const checkPassword = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:8080/checkPassword', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
+      const response = await axios.post('/checkPassword', { email, password })
 
       if (!response.ok) {
         throw new Error('Network response was not ok.');
@@ -79,13 +68,8 @@ function SigninSignup({ user, setUser }) {
 
   const checkUserVerified = async (email) => {
     try {
-      const response = await fetch('http://localhost:8080/checkUserVerified', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email })
-      });
+      const response = await axios.post('/checkUserVerified', 
+        { email })
   
       if (!response.ok) {
         throw new Error('Network response was not ok.');
@@ -103,13 +87,7 @@ function SigninSignup({ user, setUser }) {
   const saveUserData = async (name, email, password) => {
     try {
       const userData = { name, email, password };
-      const response = await fetch('http://localhost:8080/saveUserData', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(userData)
-      });
+      const response = await axios.post('/saveUserData', {userData})
   
       if (!response.ok) {
         throw new Error('Network response was not ok.');
@@ -163,13 +141,8 @@ function SigninSignup({ user, setUser }) {
 
     // After saving user data but before navigating
     try {
-      const response = await fetch('http://localhost:8080/handleSignup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: signupEmail }), // Use signupEmail here
-      });
+      const response = await axios.post('/handleSignup', ({ email: signupEmail })) // Use signupEmail here
+    
     
       if (!response.ok) {
         throw new Error('Failed to fetch user data');
@@ -231,13 +204,7 @@ function SigninSignup({ user, setUser }) {
     localStorage.setItem('userEmail', signinEmail);
     // Proceed with login if user exists, password is correct, and user is verified
     try {
-      const response = await fetch('http://localhost:8080/handleSignin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: signinEmail }),
-      });
+      const response = await axios.post('/handleSignin', { email: signinEmail })
 
       if (!response.ok) {
         throw new Error('Failed to fetch username');

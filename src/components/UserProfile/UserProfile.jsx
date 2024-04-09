@@ -9,6 +9,7 @@ import avatar3 from '../avatars/avatar3.jpg'; // Import avatar images
 import avatar4 from '../avatars/avatar4.jpg'; // Import avatar images
 import { useUser } from '../../UserContext';
 
+
 const UserProfile = () => {
   const userName = localStorage.getItem('username');
   const userEmail = localStorage.getItem('userEmail');
@@ -30,7 +31,7 @@ const UserProfile = () => {
 
   const fetchUserPosts = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/user/posts?email=${userEmail}`);
+      const response = await axios.get(`/user/posts?email=${userEmail}`);
       setUserPosts(response.data);
     } catch (error) {
       console.error('Failed to fetch user posts:', error);
@@ -39,7 +40,7 @@ const UserProfile = () => {
 
   const fetchDateCreated = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/user/date-created?email=${userEmail}`);
+      const response = await axios.get(`/user/date-created?email=${userEmail}`);
       setDateCreated(response.data.dateCreated);
     } catch (error) {
       console.error('Failed to fetch date created:', error);
@@ -48,7 +49,7 @@ const UserProfile = () => {
 
   const fetchAvatar = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/user/avatar?email=${userEmail}`);
+      const response = await axios.get(`/user/avatar?email=${userEmail}`);
       const avatarUrl = response.data.avatarUrl;
       if (avatarUrl) {
         setSelectedAvatar(avatarUrl);
@@ -66,7 +67,7 @@ const UserProfile = () => {
     setSelectedAvatar(avatarUrl); // Set selected avatar when clicked
     setUserAvatar(avatarUrl);
     // Send request to backend to update avatar
-    axios.post('http://localhost:8080/user/update-avatar', { email: userEmail, avatarUrl })
+    axios.post('/user/update-avatar', { email: userEmail, avatarUrl })
       .then(() => console.log('Avatar updated successfully'))
       .catch(error => console.error('Failed to update avatar:', error));
   };
