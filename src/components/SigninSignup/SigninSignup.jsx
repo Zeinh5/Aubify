@@ -81,22 +81,27 @@ function SigninSignup({ user, setUser }) {
     }
   };  
 
-  const saveUserData = async (name, email, password) => {
-    try {
-      const userData = { name, email, password };
-      const response = await axios.post('/saveUserData', {userData})
-  
-      if (response.status !== 200) {
-        throw new Error('Network response was not ok.');
+const saveUserData = async (name, email, password) => {
+  try {
+    const response = await axios.post('/saveUserData', {
+      name: name,
+      email: email,
+      password: password
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
       }
-  
-      // Handle success if needed
-      console.log('User data saved successfully!');
-    } catch (error) {
-      console.error('Error saving user data:', error);
-      // Handle error, such as displaying a generic error message to the user
+    });
+
+    if (response.status !== 200) {
+      throw new Error('Network response was not ok.');
     }
-  };  
+    console.log('User data saved successfully!');
+  } catch (error) {
+    console.error('Error saving user data:', error.response ? error.response.data : error.message);
+  }
+};
+  
 
   const handleSignup = async (e) => {
     e.preventDefault();
