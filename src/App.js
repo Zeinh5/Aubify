@@ -14,7 +14,7 @@ import Report from "./components/Report/Report";
 import axios  from "axios";
 
 function App() {
-  axios.defaults.baseURL="http://localhost:8080"
+  axios.defaults.baseURL="https://aubify-b.onrender.com/"
   return (
     <UserProvider>
       <Router>
